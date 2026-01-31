@@ -4,12 +4,14 @@ import { ArrowLeft, Save, Layers, User, GraduationCap, FileText, Star, Eye, Exte
 import { EducationLevel } from '../../types';
 import { fetchJournalCategories, fetchJournalDetail, updateJournal } from '../../services/api';
 import { useLevelConfig } from '../../hooks/useLevelConfig';
+import { useToast } from '../../components/ToastProvider';
 
 const EditJournal: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const LEVEL_CONFIG = useLevelConfig();
   const journalId = parseInt(id || '0');
+  const toast = useToast();
 
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -26,7 +28,7 @@ const EditJournal: React.FC = () => {
   const [isBest, setIsBest] = useState(false);
   const DEFAULT_JENJANG = import.meta.env.VITE_DEFAULT_JENJANG || 'UMUM';
   const isLocked = DEFAULT_JENJANG !== 'UMUM';
-  const [jenjang, setJenjang] = useState<EducationLevel>('SMA');
+  const [jenjang, setJenjang] = useState<EducationLevel>('MA');
 
   // File
   const [existingFileUrl, setExistingFileUrl] = useState('');
@@ -55,7 +57,7 @@ const EditJournal: React.FC = () => {
 
       } catch (error) {
         console.error('Error loading journal categories:', error);
-        alert('Gagal memuat data jurnal');
+        toast.error('Gagal memuat data jurnal');
       } finally {
         setIsLoading(false);
       }
@@ -72,7 +74,7 @@ const EditJournal: React.FC = () => {
       const fileSizeMB = file.size / (1024 * 1024);
 
       if (fileSizeMB > 10) {
-        alert('File terlalu besar! Maksimal 10MB');
+        toast.warning('File terlalu besar! Maksimal 10MB');
         e.target.value = '';
         return;
       }
@@ -84,10 +86,10 @@ const EditJournal: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!title.trim()) { alert('Judul harus diisi'); return; }
-    if (!abstract.trim()) { alert('Abstrak harus diisi'); return; }
-    if (!author.trim()) { alert('Penulis harus diisi'); return; }
-    if (score < 0 || score > 100) { alert('Nilai harus antara 0-100'); return; }
+    if (!title.trim()) { toast.warning('Judul harus diisi'); return; }
+    if (!abstract.trim()) { toast.warning('Abstrak harus diisi'); return; }
+    if (!author.trim()) { toast.warning('Penulis harus diisi'); return; }
+    if (score < 0 || score > 100) { toast.warning('Nilai harus antara 0-100'); return; }
 
     setIsSubmitting(true);
     try {
@@ -102,7 +104,7 @@ const EditJournal: React.FC = () => {
         mentor,
         score,
         date: today,
-        jenjang: jenjang.toLowerCase(),
+        jenjang: jenjang,
         is_best: isBest,
         documentUrl: newFile || undefined,
       });
@@ -112,10 +114,10 @@ const EditJournal: React.FC = () => {
       sessionStorage.removeItem('admin_journals_cats');
       sessionStorage.removeItem('admin_journals_timestamp');
 
-      alert(response.message || 'Jurnal berhasil diperbarui!');
+      toast.success(response.message || 'Jurnal berhasil diperbarui!');
       navigate('/admin/journals');
     } catch (error: any) {
-      alert(error.message || 'Gagal memperbarui jurnal');
+      toast.error(error.message || 'Gagal memperbarui jurnal');
       console.error('Error updating journal:', error);
     } finally {
       setIsSubmitting(false);
@@ -188,18 +190,28 @@ const EditJournal: React.FC = () => {
                   <Layers className="w-4 h-4" /> Jenjang Pendidikan
                 </label>
                 <select
-                  className={`w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl font-bold text-slate-700 appearance-none outline-none focus:ring-2 focus:ring-islamic-green-500 ${isLocked ? 'opacity-75 cursor-not-allowed' : ''}`}
+                  className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl font-bold text-slate-700 appearance-none outline-none focus:ring-2 focus:ring-islamic-green-500"
                   value={jenjang}
                   onChange={(e) => setJenjang(e.target.value as EducationLevel)}
-                  disabled={isLocked}
                 >
-                  {Object.keys(LEVEL_CONFIG)
-                    .filter(key => key !== 'UMUM')
-                    .map(key => (
-                      <option key={key} value={key}>
-                        {key} ({LEVEL_CONFIG[key].type})
+                  {isLocked ? (
+                    // When locked, show only env jenjang and UMUM
+                    <>
+                      <option value={DEFAULT_JENJANG}>
+                        {LEVEL_CONFIG[DEFAULT_JENJANG]?.name || DEFAULT_JENJANG}
                       </option>
-                    ))}
+                      <option value="UMUM">
+                        {LEVEL_CONFIG['UMUM']?.name || 'Yayasan AL Mannan'}
+                      </option>
+                    </>
+                  ) : (
+                    // When not locked, show all jenjang
+                    Object.keys(LEVEL_CONFIG).map(key => (
+                      <option key={key} value={key}>
+                        {LEVEL_CONFIG[key].name}
+                      </option>
+                    ))
+                  )}
                 </select>
               </div>
 
