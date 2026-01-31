@@ -2,6 +2,8 @@
 import React, { useState, useContext, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Save, Star, Layers, User, GraduationCap, FileText, Loader2, Award } from 'lucide-react';
+import ReactQuill from 'react-quill-new';
+import 'react-quill-new/dist/quill.snow.css';
 import { LevelContext } from '../../App';
 import { EducationLevel } from '../../types';
 import { createJournal, fetchJournalCategories } from '../../services/api';
@@ -209,13 +211,30 @@ const CreateJournal: React.FC = () => {
               <label className="text-xs font-black text-slate-400 uppercase tracking-widest flex items-center gap-2 mb-4">
                 <FileText className="w-4 h-4" /> Abstrak
               </label>
-              <textarea
-                rows={6}
-                className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-[2rem] outline-none"
-                value={abstract}
-                onChange={(e) => setAbstract(e.target.value)}
-                placeholder="Ringkasan atau abstrak jurnal..."
-              ></textarea>
+              <div className="bg-slate-50 border border-slate-100 rounded-[2.5rem] overflow-hidden">
+                <ReactQuill
+                  theme="snow"
+                  value={abstract}
+                  onChange={setAbstract}
+                  modules={{
+                    toolbar: [
+                      [{ 'header': [1, 2, 3, false] }],
+                      ['bold', 'italic', 'underline', 'strike', 'blockquote'],
+                      [{ 'list': 'ordered' }, { 'list': 'bullet' }, { 'indent': '-1' }, { 'indent': '+1' }],
+                      ['link', 'image'],
+                      ['clean']
+                    ],
+                  }}
+                  formats={[
+                    'header',
+                    'bold', 'italic', 'underline', 'strike', 'blockquote',
+                    'list', 'bullet', 'indent',
+                    'link', 'image'
+                  ]}
+                  className="h-96 mb-12"
+                  placeholder="Ringkasan atau abstrak jurnal..."
+                />
+              </div>
             </div>
 
             <div>

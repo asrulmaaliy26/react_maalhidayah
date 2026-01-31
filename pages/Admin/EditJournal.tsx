@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, Save, Layers, User, GraduationCap, FileText, Star, Eye, ExternalLink, Tag, Loader2, Award } from 'lucide-react';
+import ReactQuill from 'react-quill-new';
+import 'react-quill-new/dist/quill.snow.css';
 import { EducationLevel } from '../../types';
 import { fetchJournalCategories, fetchJournalDetail, updateJournal } from '../../services/api';
 import { useLevelConfig } from '../../hooks/useLevelConfig';
@@ -241,7 +243,29 @@ const EditJournal: React.FC = () => {
 
               <div className="md:col-span-2">
                 <label className="text-xs font-black text-slate-400 uppercase tracking-widest block mb-4">Abstrak Jurnal</label>
-                <textarea rows={8} className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-[2.5rem] italic font-medium" value={abstract} onChange={(e) => setAbstract(e.target.value)}></textarea>
+                <div className="bg-slate-50 border border-slate-100 rounded-[2.5rem] overflow-hidden">
+                  <ReactQuill
+                    theme="snow"
+                    value={abstract}
+                    onChange={setAbstract}
+                    modules={{
+                      toolbar: [
+                        [{ 'header': [1, 2, 3, false] }],
+                        ['bold', 'italic', 'underline', 'strike', 'blockquote'],
+                        [{ 'list': 'ordered' }, { 'list': 'bullet' }, { 'indent': '-1' }, { 'indent': '+1' }],
+                        ['link', 'image'],
+                        ['clean']
+                      ],
+                    }}
+                    formats={[
+                      'header',
+                      'bold', 'italic', 'underline', 'strike', 'blockquote',
+                      'list', 'bullet', 'indent',
+                      'link', 'image'
+                    ]}
+                    className="h-96 mb-12"
+                  />
+                </div>
               </div>
             </div>
           </section>

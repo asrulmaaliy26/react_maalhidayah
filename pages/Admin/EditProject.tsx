@@ -2,6 +2,8 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, Save, Layers, User, Image as ImageIcon, AlignLeft, Tag, FileText, Trash2, Plus, Loader2 } from 'lucide-react';
+import ReactQuill from 'react-quill-new';
+import 'react-quill-new/dist/quill.snow.css';
 import { EducationLevel, ProjectDocument } from '../../types';
 import { fetchProjectCategories, fetchProjectDetail, updateProject, deleteProjectDocument } from '../../services/api';
 import { useLevelConfig } from '../../hooks/useLevelConfig';
@@ -272,7 +274,29 @@ const EditProject: React.FC = () => {
                   <label className="text-xs font-black text-slate-400 uppercase tracking-widest flex items-center gap-2 mb-4">
                      <AlignLeft className="w-4 h-4" /> Deskripsi Projek
                   </label>
-                  <textarea rows={8} className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-[2rem] outline-none" value={description} onChange={(e) => setDescription(e.target.value)}></textarea>
+                  <div className="bg-slate-50 border border-slate-100 rounded-[2.5rem] overflow-hidden">
+                     <ReactQuill
+                        theme="snow"
+                        value={description}
+                        onChange={setDescription}
+                        modules={{
+                           toolbar: [
+                              [{ 'header': [1, 2, 3, false] }],
+                              ['bold', 'italic', 'underline', 'strike', 'blockquote'],
+                              [{ 'list': 'ordered' }, { 'list': 'bullet' }, { 'indent': '-1' }, { 'indent': '+1' }],
+                              ['link', 'image'],
+                              ['clean']
+                           ],
+                        }}
+                        formats={[
+                           'header',
+                           'bold', 'italic', 'underline', 'strike', 'blockquote',
+                           'list', 'bullet', 'indent',
+                           'link', 'image'
+                        ]}
+                        className="h-96 mb-12"
+                     />
+                  </div>
                </div>
 
                <div className="md:col-span-2">
