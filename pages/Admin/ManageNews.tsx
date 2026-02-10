@@ -96,12 +96,12 @@ const ManageNews: React.FC = () => {
       const matchesCategory = activeCategory === 'Semua' || item.category === activeCategory;
       // Show items if: no env filter, jenjang is UMUM, or jenjang matches env
       const matchesJenjang = !visibleJenjang ||
-         item.jenjang?.toLowerCase() === 'umum' ||
-         item.jenjang?.toLowerCase() === visibleJenjang.toLowerCase();
+         item.jenjang === 'UMUM' ||
+         item.jenjang === visibleJenjang;
 
       // Debug logging (can be removed later)
       if (!matchesJenjang && item.jenjang) {
-         console.log(`Filtered out: "${item.title}" - jenjang: "${item.jenjang}" (${item.jenjang?.toLowerCase()}) vs env: "${visibleJenjang}" (${visibleJenjang?.toLowerCase()})`);
+         console.log(`Filtered out: "${item.title}" - jenjang: "${item.jenjang}" vs env: "${visibleJenjang}"`);
       }
 
       return matchesSearch && matchesCategory && matchesJenjang;
